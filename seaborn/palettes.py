@@ -767,28 +767,27 @@ def _parse_cubehelix_args(argstr):
     if argstr.startswith("ch:"):
         argstr = argstr[3:]
 
-    if argstr.endswith("_r"):
-        reverse = True
+    reverse = argstr.endswith("_r")
+    if reverse:
         argstr = argstr[:-2]
-    else:
-        reverse = False
 
     if not argstr:
         return [], {"reverse": reverse}
 
-    all_args = argstr.split(",")
+    args = []
+    kwargs = {}
+    kwarg_map = {
+        "s": "start", "r": "rot", "g": "gamma",
+        "h": "hue", "l": "light", "d": "dark",  # noqa: E741
+    }
 
-    args = [float(a.strip(" ")) for a in all_args if "=" not in a]
-
-    kwargs = [a.split("=") for a in all_args if "=" in a]
-    kwargs = {k.strip(" "): float(v.strip(" ")) for k, v in kwargs}
-
-    kwarg_map = dict(
-        s="start", r="rot", g="gamma",
-        h="hue", l="light", d="dark",  # noqa: E741
-    )
-
-    kwargs = {kwarg_map.get(k, k): v for k, v in kwargs.items()}
+    for a in argstr.split(","):
+        if "=" in a:
+            k, v = a.split("=")
+            k = kwarg_map.get(k.strip(), k.strip())
+            kwargs[k] = float(v.strip())
+        else:
+            args.append(float(a.strip()))
 
     if reverse:
         kwargs["reverse"] = True
