@@ -278,8 +278,14 @@ class Dash(Paths):
     def _setup_segments(self, data, orient):
 
         ori = ["x", "y"].index(orient)
-        xys = data[["x", "y"]].to_numpy().astype(float)
-        segments = np.stack([xys, xys], axis=1)
-        segments[:, 0, ori] -= data["width"] / 2
-        segments[:, 1, ori] += data["width"] / 2
+        xys = data[["x", "y"]].to_numpy(dtype=float)  # Directly convert to float.
+        width = data["width"].to_numpy(dtype=float)  # Convert width to numpy array once.
+
+        segments = np.zeros((xys.shape[0], 2, xys.shape[1]), dtype=float)  # Pre-allocate the array.
+        segments[:, :, :] = xys[:, None, :]  # Broadcast xys array to fill both segments.
+
+        # Direct operations on segments without intermediate allocations.
+        segments[:, 0, ori] -= width / 2
+        segments[:, 1, ori] += width / 2
+        
         return segments
