@@ -69,3 +69,11 @@ filterwarnings = [
    "ignore:\\s*Pyarrow will become a required dependency of pandas:DeprecationWarning",
    "ignore:datetime.datetime.utcfromtimestamp\\(\\) is deprecated:DeprecationWarning",
  ]
+
+[tool.codeflash]
+# All paths are relative to this pyproject.toml's directory.
+module-root = "seaborn"
+tests-root = "tests"
+test-framework = "pytest"
+ignore-paths = ["seaborn/_testing.py"]
+formatter-cmds = ["disabled"]
