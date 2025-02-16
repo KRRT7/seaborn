@@ -209,11 +209,16 @@ class Paths(Mark):
 
     def _setup_segments(self, data, orient):
 
+        # Directly use NumPy array sorting for better performance if sorting is needed
         if self._sort:
-            data = data.sort_values(orient, kind="mergesort")
-
-        # Column stack to avoid block consolidation
-        xy = np.column_stack([data["x"], data["y"]])
+            # Convert the column to NumPy array if it's not already
+            # Using NumPy to sort, assuming 'data' is a pandas DataFrame
+            orient_data = data[orient].to_numpy() if hasattr(data[orient], 'to_numpy') else np.array(data[orient])
+            sort_idx = np.argsort(orient_data, kind="mergesort")
+            xy = np.column_stack([data["x"].to_numpy()[sort_idx], data["y"].to_numpy()[sort_idx]])
+        else:
+            # Directly column stack if no sort is needed
+            xy = np.column_stack([data["x"].to_numpy(), data["y"].to_numpy()])
 
         return [xy]
 
